@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block page_title %}Summary Reports{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h6 class="fw-bold mb-3">Tasks by Status</h6>
+      <table class="table table-sm">
+        <thead><tr><th>Status</th><th>Count</th></tr></thead>
+        <tbody>{% for item in tasks_by_status %}<tr><td>{{ item.status|title }}</td><td><span class="badge bg-primary">{{ item.count }}</span></td></tr>{% endfor %}</tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h6 class="fw-bold mb-3">Attendance Overview</h6>
+      <table class="table table-sm">
+        <thead><tr><th>Status</th><th>Count</th></tr></thead>
+        <tbody>{% for item in attendance_summary %}<tr><td>{{ item.status|title }}</td><td><span class="badge bg-info">{{ item.count }}</span></td></tr>{% endfor %}</tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h6 class="fw-bold mb-3">Top Performers</h6>
+      <table class="table table-sm">
+        <thead><tr><th>Employee</th><th>Tasks Done</th></tr></thead>
+        <tbody>{% for emp in top_performers %}<tr><td>{{ emp.get_full_name|default:emp.username }}</td><td><span class="badge bg-success">{{ emp.done_tasks }}</span></td></tr>{% endfor %}</tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

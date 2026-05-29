@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block page_title %}Check Out{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-5">
+  <div class="card p-4 text-center">
+    <i class="fas fa-sign-out-alt fa-3x text-warning mb-3"></i>
+    <h5 class="fw-bold">Check Out</h5>
+    <p class="text-muted">Checked in at: <strong>{{ record.check_in }}</strong></p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-warning w-100 fw-semibold"><i class="fas fa-sign-out-alt me-1"></i>Check Out Now</button>
+    </form>
+    <a href="{% url 'attendance:list' %}" class="btn btn-link mt-2">Cancel</a>
+  </div>
+</div></div>
+{% endblock %}

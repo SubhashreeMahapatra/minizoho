@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block page_title %}Review Leave{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-6">
+  <div class="card p-4">
+    <h5 class="fw-bold mb-4">Review Leave Request</h5>
+    <dl class="row">
+      <dt class="col-sm-4">Employee</dt><dd class="col-sm-8">{{ leave.user.get_full_name }}</dd>
+      <dt class="col-sm-4">Leave Type</dt><dd class="col-sm-8">{{ leave.get_leave_type_display }}</dd>
+      <dt class="col-sm-4">From</dt><dd class="col-sm-8">{{ leave.start_date }}</dd>
+      <dt class="col-sm-4">To</dt><dd class="col-sm-8">{{ leave.end_date }}</dd>
+      <dt class="col-sm-4">Days</dt><dd class="col-sm-8">{{ leave.days_requested }}</dd>
+      <dt class="col-sm-4">Reason</dt><dd class="col-sm-8">{{ leave.reason }}</dd>
+    </dl>
+    <form method="post" class="d-flex gap-2 mt-3">
+      {% csrf_token %}
+      <button name="action" value="approved" class="btn btn-success">Approve</button>
+      <button name="action" value="rejected" class="btn btn-danger">Reject</button>
+      <a href="{% url 'attendance:leave_list' %}" class="btn btn-secondary">Back</a>
+    </form>
+  </div>
+</div></div>
+{% endblock %}

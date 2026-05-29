@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block page_title %}Task Detail{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <div class="card p-4 mb-3">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <h5 class="fw-bold">{{ task.title }}</h5>
+        <div>
+          <span class="badge badge-priority-{{ task.priority }}">{{ task.get_priority_display }}</span>
+          <span class="badge bg-secondary ms-1">{{ task.get_status_display }}</span>
+          {% if task.is_overdue %}<span class="badge bg-danger ms-1">Overdue</span>{% endif %}
+        </div>
+      </div>
+      <p class="text-muted">{{ task.description|default:"No description." }}</p>
+      <div class="row mt-3">
+        <div class="col-md-6"><small class="text-muted">Assigned To</small><div class="fw-semibold">{{ task.assigned_to.get_full_name|default:"-" }}</div></div>
+        <div class="col-md-6"><small class="text-muted">Due Date</small><div class="fw-semibold">{{ task.due_date|default:"-" }}</div></div>
+        <div class="col-md-6 mt-2"><small class="text-muted">Created By</small><div class="fw-semibold">{{ task.created_by.get_full_name|default:"-" }}</div></div>
+        <div class="col-md-6 mt-2"><small class="text-muted">Tags</small><div class="fw-semibold">{{ task.tags|default:"-" }}</div></div>
+      </div>
+    </div>
+    <div class="card p-4">
+      <h6 class="fw-bold mb-3">Comments ({{ task.comments.count }})</h6>
+      {% for comment in task.comments.all %}
+      <div class="mb-3 pb-3 border-bottom">
+        <div class="d-flex justify-content-between"><strong>{{ comment.author.get_full_name|default:comment.author.username }}</strong><small class="text-muted">{{ comment.created_at|date:"M d, Y H:i" }}</small></div>
+        <p class="mb-0 mt-1">{{ comment.content }}</p>
+      </div>
+      {% empty %}<p class="text-muted small">No comments yet.</p>{% endfor %}
+      <form method="post" class="mt-3">
+        {% csrf_token %}{{ comment_form.content }}
+        <button type="submit" class="btn btn-primary btn-sm mt-2">Add Comment</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-4 mb-3">
+      <h6 class="fw-bold mb-3">Update Status</h6>
+      <form method="post" action="{% url 'tasks:update_status' task.pk %}">
+        {% csrf_token %}
+        <select name="status" class="form-select form-select-sm mb-2">
+          {% for val,label in task.STATUS_CHOICES %}<option value="{{ val }}" {% if task.status == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary btn-sm w-100">Update</button>
+      </form>
+    </div>
+    <div class="d-flex flex-column gap-2">
+      <a href="{% url 'tasks:edit' task.pk %}" class="btn btn-outline-secondary"><i class="fas fa-edit me-1"></i>Edit Task</a>
+      {% if user.role != 'employee' %}<a href="{% url 'tasks:delete' task.pk %}" class="btn btn-outline-danger"><i class="fas fa-trash me-1"></i>Delete</a>{% endif %}
+      <a href="{% url 'tasks:list' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i>Back to Tasks</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

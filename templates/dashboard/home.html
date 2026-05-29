@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+
+{% if user.role == 'admin' or user.role == 'manager' %}
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card stat-card p-3"><div class="d-flex justify-content-between"><div><div class="text-muted small">Total Tasks</div><div class="fs-3 fw-bold">{{ total_tasks }}</div></div><i class="fas fa-tasks fa-2x text-primary opacity-25"></i></div></div></div>
+  <div class="col-md-3"><div class="card stat-card p-3" style="border-left-color:#16a34a"><div class="d-flex justify-content-between"><div><div class="text-muted small">Completed</div><div class="fs-3 fw-bold text-success">{{ tasks_done }}</div></div><i class="fas fa-check-circle fa-2x text-success opacity-25"></i></div></div></div>
+  <div class="col-md-3"><div class="card stat-card p-3" style="border-left-color:#f59e0b"><div class="d-flex justify-content-between"><div><div class="text-muted small">In Progress</div><div class="fs-3 fw-bold text-warning">{{ tasks_in_progress }}</div></div><i class="fas fa-spinner fa-2x text-warning opacity-25"></i></div></div></div>
+  <div class="col-md-3"><div class="card stat-card p-3" style="border-left-color:#dc2626"><div class="d-flex justify-content-between"><div><div class="text-muted small">Overdue</div><div class="fs-3 fw-bold text-danger">{{ overdue_count }}</div></div><i class="fas fa-exclamation-circle fa-2x text-danger opacity-25"></i></div></div></div>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card p-3 border-left-4" style="border-left:4px solid #0ea5e9"><div class="text-muted small">Present Today</div><div class="fs-3 fw-bold text-info">{{ present_today }}/{{ total_employees }}</div></div></div>
+  <div class="col-md-3"><div class="card p-3" style="border-left:4px solid #8b5cf6"><div class="text-muted small">Pending Leaves</div><div class="fs-3 fw-bold" style="color:#8b5cf6">{{ pending_leaves }}</div></div></div>
+</div>
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3">Tasks by Status</h6>
+      <canvas id="statusChart" height="200"></canvas>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3">My Pending Tasks</h6>
+      {% for t in my_tasks %}
+      <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+        <a href="{% url 'tasks:detail' t.pk %}" class="text-decoration-none text-dark fw-semibold">{{ t.title }}</a>
+        <span class="badge badge-priority-{{ t.priority }}">{{ t.priority }}</span>
+      </div>
+      {% empty %}<p class="text-muted small mt-2">No pending tasks.</p>{% endfor %}
+    </div>
+  </div>
+</div>
+
+{% else %}
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card stat-card p-3"><div class="text-muted small">Pending Tasks</div><div class="fs-3 fw-bold text-primary">{{ pending_tasks }}</div></div></div>
+  <div class="col-md-4"><div class="card stat-card p-3" style="border-left-color:#16a34a"><div class="text-muted small">Completed Tasks</div><div class="fs-3 fw-bold text-success">{{ done_tasks }}</div></div></div>
+  <div class="col-md-4">
+    <div class="card stat-card p-3" style="border-left-color:#0ea5e9">
+      <div class="text-muted small">Today Attendance</div>
+      {% if today_attendance %}
+      <div class="fw-bold text-info">{{ today_attendance.get_status_display }}</div>
+      <small class="text-muted">In: {{ today_attendance.check_in|default:"-" }} | Out: {{ today_attendance.check_out|default:"-" }}</small>
+      {% else %}
+      <div class="fw-bold text-muted">Not checked in</div>
+      <a href="{% url 'attendance:check_in' %}" class="btn btn-sm btn-info mt-1">Check In Now</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<div class="row g-3">
+  <div class="col-md-7">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3">My Tasks</h6>
+      {% for t in my_tasks %}
+      <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+        <a href="{% url 'tasks:detail' t.pk %}" class="text-decoration-none text-dark fw-semibold">{{ t.title }}</a>
+        <div>
+          <span class="badge badge-priority-{{ t.priority }} me-1">{{ t.priority }}</span>
+          <span class="badge bg-secondary">{{ t.get_status_display }}</span>
+        </div>
+      </div>
+      {% empty %}<p class="text-muted small mt-2">No tasks assigned.</p>{% endfor %}
+    </div>
+  </div>
+  <div class="col-md-5">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3">Recent Leave Requests</h6>
+      {% for leave in my_leaves %}
+      <div class="py-2 border-bottom">
+        <div class="fw-semibold">{{ leave.get_leave_type_display }}</div>
+        <div class="text-muted small">{{ leave.start_date }} to {{ leave.end_date }}</div>
+        <span class="badge {% if leave.status == 'approved' %}bg-success{% elif leave.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %}">{{ leave.get_status_display }}</span>
+      </div>
+      {% empty %}<p class="text-muted small mt-2">No leave requests.</p>{% endfor %}
+      <a href="{% url 'attendance:leave_apply' %}" class="btn btn-sm btn-outline-primary mt-2">Apply Leave</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+{% block extra_js %}
+{% if user.role == 'admin' or user.role == 'manager' %}
+<script>
+const statusData = {{ status_data|safe }};
+new Chart(document.getElementById('statusChart'), {
+  type: 'doughnut',
+  data: {
+    labels: statusData.map(d => d.status),
+    datasets: [{ data: statusData.map(d => d.count), backgroundColor: ['#3b82f6','#f59e0b','#8b5cf6','#22c55e','#ef4444'] }]
+  },
+  options: { plugins: { legend: { position: 'bottom' } } }
+});
+</script>
+{% endif %}
+{% endblock %}

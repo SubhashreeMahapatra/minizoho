@@ -1,0 +1,4 @@
+.sidebar-section-header { font-size:.65rem; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.4); padding:.5rem 1rem .25rem; }
+.card-hover { transition:box-shadow .2s,transform .2s; }
+.card-hover:hover { box-shadow:0 4px 20px rgba(0,0,0,.12); transform:translateY(-2px); }
+.table td, .table th { vertical-align:middle; }
