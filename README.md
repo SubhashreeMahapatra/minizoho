@@ -23,8 +23,8 @@ A full-featured Django web application for managing employee tasks and attendanc
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/yourname/task-attendance-system.git
-cd task-attendance-system
+git clone https://github.com/yourname/minizoho.git
+cd minizoho
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
