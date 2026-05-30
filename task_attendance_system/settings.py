@@ -73,7 +73,7 @@ WSGI_APPLICATION = 'task_attendance_system.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.pstgresql',
         'NAME': config('DB_NAME', default='task_attendance_db'),
         'USER': config('DB_USER', default='root'),
         'PASSWORD': config('DB_PASSWORD', default=''),
