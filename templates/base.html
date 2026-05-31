@@ -29,7 +29,7 @@
 <body>
 {% if user.is_authenticated %}
 <div class="sidebar d-flex flex-column">
-    <div class="brand"><i class="fas fa-tasks me-2"></i>TaskFlow</div>
+    <div class="brand"><i class="fas fa-tasks me-2"></i>Work_AnyWhere</div>
     <nav class="flex-grow-1 py-2">
         <a href="{% url 'dashboard:home' %}" class="nav-link {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}"><i class="fas fa-home me-2"></i>Dashboard</a>
         <a href="{% url 'tasks:list' %}" class="nav-link {% if request.resolver_match.app_name == 'tasks' %}active{% endif %}"><i class="fas fa-check-square me-2"></i>Tasks</a>
